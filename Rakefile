@@ -1,10 +1,9 @@
 require 'bundler'
+require 'rake/extensiontask'
 
 Bundler::GemHelper.install_tasks
 Bundler.setup(:default, :development)
 
-require 'rake'
-require 'rake/extensiontask'
 Rake::ExtensionTask.new do |ext|
   ext.name = 'oderb'
   ext.ext_dir = 'ext/oderb'

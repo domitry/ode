@@ -1,5 +1,5 @@
 require "oderb/version"
-require_relative "../oderb.so"
+require_relative "oderb.so"
 
 module Oderb
   # Your code goes here...
