@@ -38,5 +38,6 @@ module Ode
     end
 
     attr_reader :t, :y
+    print "Hello, world!"
   end
 end
