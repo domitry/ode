@@ -8,10 +8,10 @@ Gem::Specification.new do |spec|
   spec.version       = Ode::VERSION
   spec.authors       = ["domitry"]
   spec.email         = ["domitry@gmail.com"]
-  spec.summary       = %q{The Ruby wrapper for ODEPACK}
-  spec.description   = %q{The Ruby wrapper for ODEPACK}
+  spec.summary       = %q{A ODE solver package for Ruby users.}
+  spec.description   = %q{A ODE solver package for Ruby users.}
   spec.homepage      = ""
-  spec.license       = "MIT"
+  spec.license       = "MIT and SciPy license"
   spec.extensions    = %w[ext/ode/extconf.rb]
   spec.files         = `git ls-files -z`.split("\x0")
   spec.executables   = spec.files.grep(%r{^bin/}) { |f| File.basename(f) }

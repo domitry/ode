@@ -22,7 +22,7 @@ void ode_function(int *n, double *t, double *y, double *ydot){
   int i;
 
   for(i=0; i<number_of_params; i++)
-    rb_ary_store(y_arr, i, y[i]);
+    rb_ary_store(y_arr, i, DBL2NUM(y[i]));
   
   ret = rb_funcall(func_proc, rb_intern("call"), 3, DBL2NUM(*t), y_arr, f_args);
 
@@ -48,6 +48,8 @@ VALUE excute_lsoda(VALUE self, VALUE t_out, VALUE func, VALUE jac, VALUE init_t,
 
   int jt = 2;     // jacobian type indicator. 1: user provides full jacobian. 2: interanally generated jacobian.
   VALUE ret_arr = rb_ary_new2(neq);
+  double h0 = 0, hmax =0, hmin = 0;
+  int ixpr=0, max_step=0, max_hnil=0, max_ordn=12, max_ords=5;
   int i;
 
   RESTORE_NEQ(neq)
@@ -59,15 +61,13 @@ VALUE excute_lsoda(VALUE self, VALUE t_out, VALUE func, VALUE jac, VALUE init_t,
   }
 
   // parse options (TODO: accept array)
-  itol = NUM2INT(rb_hash_lookup(opts, rb_intern("itol")));
+  itol = NUM2INT(rb_hash_lookup(opts, ID2SYM(rb_intern("itol"))));
 
-  return Qnil;
-
-  rtol = NUM2DBL(rb_hash_aref(opts, rb_intern("rtol")));
-  atol = NUM2DBL(rb_hash_aref(opts, rb_intern("atol")));
+  rtol = NUM2DBL(rb_hash_aref(opts, ID2SYM(rb_intern("rtol"))));
+  atol = NUM2DBL(rb_hash_aref(opts, ID2SYM(rb_intern("atol"))));
 
   // decide lrw, liw
-  liw = 20;
+  liw = 20 + neq;
   iwork = (int *)ALLOC_N(int, liw);
 
   if(jac != Qnil){
@@ -77,8 +77,8 @@ VALUE excute_lsoda(VALUE self, VALUE t_out, VALUE func, VALUE jac, VALUE init_t,
   }
   else{
     int ml=0, mu=0; VALUE val;
-    if(val = rb_hash_aref(opts, rb_intern("ml")) != Qnil)ml = NUM2INT(val);
-    if(val = rb_hash_aref(opts, rb_intern("mu")) != Qnil)mu = NUM2INT(val);
+    if(val = rb_hash_aref(opts, ID2SYM(rb_intern("ml"))) != Qnil)ml = NUM2INT(val);
+    if(val = rb_hash_aref(opts, ID2SYM(rb_intern("mu"))) != Qnil)mu = NUM2INT(val);
 
     iwork[0] = mu;
     iwork[1] = ml;
@@ -86,6 +86,15 @@ VALUE excute_lsoda(VALUE self, VALUE t_out, VALUE func, VALUE jac, VALUE init_t,
   }
 
   rwork = (double *)ALLOC_N(double, lrw);
+  rwork[4] = h0;
+  rwork[5] = hmax;
+  rwork[6] = hmin;
+
+  iwork[4] = ixpr;
+  iwork[5] = max_step;
+  iwork[6] = max_hnil;
+  iwork[7] = max_ordn;
+  iwork[8] = max_ords;
 
   // run lsoda
   lsoda_(ode_function, &neq, y, &t, &tout, &itol, &rtol, &atol, &itask, &istate, &iopt, rwork, &lrw, iwork, &liw, ode_jacobian_function, &jt);
