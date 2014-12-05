@@ -2,7 +2,7 @@
 
 [![Gem Version](https://badge.fury.io/rb/ode.svg)](http://badge.fury.io/rb/ode)
 
-A ODE solver package for Ruby users.
+An ODE solver package for Ruby users.
 Ode is a the wrapper for [ODEPACK](https://computation.llnl.gov/casc/odepack/) and may perform as well as scipy.integrate.odeint and other wrappers.
 
 ## Installation
