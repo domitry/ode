@@ -1,6 +1,7 @@
 module Ode
   module Methods
     def self.default_opts(name)
+      print "Hoge"
       {
         :lsoda => {
           itol: 2,
@@ -9,7 +10,7 @@ module Ode
           ml: nil,
           mu: nil
         }
-      }[:name]
+      }[name]
     end
   end
 end

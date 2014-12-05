@@ -6,7 +6,7 @@ module Ode
       @y = 0
       @jac = jac
       @fargs = nil
-      @opts = {}
+      @opts = nil
       @method = :lsoda
     end
 
@@ -32,12 +32,11 @@ module Ode
 
     def integrate(t_out)
       @opts ||= Ode::Methods.default_opts(@method)
-      @y = Ode::Methods.call(@method, t_out, @f, @jac, @t, @y, @fargs, @opts)
+      @y = Ode::Methods.send(@method, t_out, @f, @jac, @t, @y, @fargs, @opts)
       @t = t_out
       self
     end
 
     attr_reader :t, :y
-    print "Hello, world!"
   end
 end

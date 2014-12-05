@@ -32,7 +32,7 @@ void ode_function(int *n, double *t, double *y, double *ydot){
   }
 }
 
-VALUE excute_lsoda(VALUE t_out, VALUE func, VALUE jac, VALUE init_t, VALUE init_y, VALUE fargs, VALUE opts){
+VALUE excute_lsoda(VALUE self, VALUE t_out, VALUE func, VALUE jac, VALUE init_t, VALUE init_y, VALUE fargs, VALUE opts){
   int itol; double rtol, atol;
   int *iwork; double *rwork;
   int lrw, liw;
@@ -59,7 +59,10 @@ VALUE excute_lsoda(VALUE t_out, VALUE func, VALUE jac, VALUE init_t, VALUE init_
   }
 
   // parse options (TODO: accept array)
-  itol = NUM2INT(rb_hash_aref(opts, rb_intern("itol")));
+  itol = NUM2INT(rb_hash_lookup(opts, rb_intern("itol")));
+
+  return Qnil;
+
   rtol = NUM2DBL(rb_hash_aref(opts, rb_intern("rtol")));
   atol = NUM2DBL(rb_hash_aref(opts, rb_intern("atol")));
 
@@ -74,8 +77,8 @@ VALUE excute_lsoda(VALUE t_out, VALUE func, VALUE jac, VALUE init_t, VALUE init_
   }
   else{
     int ml=0, mu=0; VALUE val;
-    if(val = rb_hash_aref(opts, rb_intern("ml")) == Qnil)ml = NUM2INT(val);
-    if(val = rb_hash_aref(opts, rb_intern("mu")) == Qnil)mu = NUM2INT(val);
+    if(val = rb_hash_aref(opts, rb_intern("ml")) != Qnil)ml = NUM2INT(val);
+    if(val = rb_hash_aref(opts, rb_intern("mu")) != Qnil)mu = NUM2INT(val);
 
     iwork[0] = mu;
     iwork[1] = ml;
@@ -83,7 +86,6 @@ VALUE excute_lsoda(VALUE t_out, VALUE func, VALUE jac, VALUE init_t, VALUE init_
   }
 
   rwork = (double *)ALLOC_N(double, lrw);
-  
 
   // run lsoda
   lsoda_(ode_function, &neq, y, &t, &tout, &itol, &rtol, &atol, &itask, &istate, &iopt, rwork, &lrw, iwork, &liw, ode_jacobian_function, &jt);
